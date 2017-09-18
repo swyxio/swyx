@@ -1,0 +1,29 @@
+{
+  "name": "swyx",
+  "version": "0.1.0",
+  "description": "an integrated authentication library",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter nyan"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sw-yx/swyx.git"
+  },
+  "engines": {
+    "node": ">=4.2.4"
+  },
+  "keywords": [
+    "authentication"
+  ],
+  "author": "swyx <swyx@swyx.io> (http://swyx.io)",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/sw-yx/swyx/issues"
+  },
+  "homepage": "https://github.com/sw-yx/swyx#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^3.5.3"
+  }
+}
