@@ -1,7 +1,7 @@
 const chalk = require('chalk')
 const debug = require('debug')('swyx:server') // run node/nodemon with `DEBUG=*` prefix to see all debug logs
 
-var server = (function (params, middleware = {}) {
+var server = function (params, middleware = {}) {
   // accepts modules that you give it if you want to take over
   let { app } = params || {}
   // if not it supplies its own
@@ -48,7 +48,7 @@ var server = (function (params, middleware = {}) {
   // ************************************
   // here we export the public facing API
   // ************************************
-  
+
   this.app = app;
   this.listen = () => {
     const appserver = app.listen(
@@ -63,32 +63,29 @@ var server = (function (params, middleware = {}) {
     )
     return appserver
   }
-  this.finalHandler = () => {
-    // Error middleware interceptor, delegates to same handler Express uses.
-    // https://github.com/expressjs/express/blob/master/lib/application.js#L162
-    // https://github.com/pillarjs/finalhandler/blob/master/index.js#L172
+  this.finalHandler = (err, req, res, next) => {
+      // Error middleware interceptor, delegates to same handler Express uses.
+      // https://github.com/expressjs/express/blob/master/lib/application.js#L162
+      // https://github.com/pillarjs/finalhandler/blob/master/index.js#L172
 
-    const PrettyError = require('pretty-error')
-    const finalHandler = require('finalhandler')
-    // PrettyError docs: https://www.npmjs.com/package/pretty-error
+      const PrettyError = require('pretty-error')
+      const finalHandler = require('finalhandler')
+      // PrettyError docs: https://www.npmjs.com/package/pretty-error
 
-    // Pretty error prints errors all pretty.
-    const prettyError = new PrettyError
-    // Skip events.js and http.js and similar core node files.
-    prettyError.skipNodeFiles()
-    // Skip all the trace lines about express' core and sub-modules.
-    prettyError.skipPackage('express')
-
-    app.use((err, req, res, next) => {
+      // Pretty error prints errors all pretty.
+      const prettyError = new PrettyError
+      // Skip events.js and http.js and similar core node files.
+      prettyError.skipNodeFiles()
+      // Skip all the trace lines about express' core and sub-modules.
+      prettyError.skipPackage('express')
       debug('---finalHandler triggered---')
       console.error(prettyError.render(err)) // could also print err.stack
       finalHandler(req, res)(err)
-    })
   }
 
   return this;
 
-})();
+}
 
 module.exports = server
 
