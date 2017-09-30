@@ -1,7 +1,7 @@
 Swyx module
 =========
 
-An experimental lightweight sugar module to integrate the NERDS (Node, Express, Redux, and SQL) stack.
+An experimental lightweight sugar module to integrate the NERDS (Node, Express, ReDux, and SQL) stack.
 
 ## Installation
 
@@ -9,9 +9,12 @@ An experimental lightweight sugar module to integrate the NERDS (Node, Express, 
 
 ## Usage
 
-    var client = require('swyx').client;
+    var client = require('swyx').client; // not yet implemented
 
     var server = require('swyx').server;
+    var app = server.app;
+    app.use('/', (req, res) => res.send('Hello World'))
+    app.finalHandler() // optional error handling
   
   
   foobar
@@ -30,3 +33,7 @@ In lieu of a formal style guide, take care to maintain the existing coding style
 - <https://medium.com/@jdaudier/how-to-create-and-publish-your-first-node-js-module-444e7585b738>
 - <http://wiki.commonjs.org/wiki/Modules/1.1>
 - useful tips <http://fredkschott.com/post/2013/12/node-js-cookbook---designing-singletons/> and [with Symbol](https://derickbailey.com/2016/03/09/creating-a-true-singleton-in-node-js-with-es6-symbols/) or maybe [not doing it ](https://medium.com/@iaincollins/how-not-to-create-a-singleton-in-node-js-bd7fde5361f5)
+
+## NPM Package notes
+
+`release-it`

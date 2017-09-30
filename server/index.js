@@ -1,70 +1,54 @@
 const chalk = require('chalk')
-const debug = require('debug')('swyx:server')
-const PrettyError = require('pretty-error')
-const finalHandler = require('finalhandler')
-// PrettyError docs: https://www.npmjs.com/package/pretty-error
-const Morgan = require('morgan');
+const debug = require('debug')('swyx:server') // run node/nodemon with `DEBUG=*` prefix to see all debug logs
 
-// Pretty error prints errors all pretty.
-const prettyError = new PrettyError
-// Skip events.js and http.js and similar core node files.
-prettyError.skipNodeFiles()
-// Skip all the trace lines about express' core and sub-modules.
-prettyError.skipPackage('express')
-
-var server = (function (params, options = {}) {
+var server = (function (params, middleware = {}) {
   // accepts modules that you give it if you want to take over
   let { app } = params || {}
   // if not it supplies its own
   app = app || require('express')()
 
-
   // everything instantiated, now parse through options
   const { 
-    bodyParser, // supply `bodyParser: false` to turn off the default code below
-    morgan,     // defaults to `morgan('dev')`, supply string to change logging type or supply `morgan` object to avoid default morgan logging
-    finalhandler // supply `finalhandler: false` to turn off the error handling with finalhandler
-  } = options
+    bodyParser, // supply `bodyParser: null` to turn off the default json and urlencoded config
+    morgan,     // supply `morgan: null` to turn off. defaults to `morgan('dev')`, supply string to change logging type or supply `morgan` object to avoid default morgan logging
+  } = middleware
 
-  // supply `bodyParser: false` to turn off the default code below
-  if (!bodyParser) {
+  // supply `bodyParser: null` to turn off the default code below
+  if (bodyParser !== null) {
     const bp = require('body-parser')
     app.use(bp.json());
     app.use(bp.urlencoded({ extended: true }));
   }
 
-  // defaults to `Morgan('dev')`, supply string to change logging type or supply `morgan` object to avoid default morgan logging
-  if (!morgan) app.use(Morgan('dev'))
-  else typeof morgan === 'string' ? app.use(Morgan(morgan)) : app.use(morgan)
-
-
-  // supply `finalhandler: false` to turn off the error handling for 500
-  if (!finalhandler) {
-    // Error middleware interceptor, delegates to same handler Express uses.
-    // https://github.com/expressjs/express/blob/master/lib/application.js#L162
-    // https://github.com/pillarjs/finalhandler/blob/master/index.js#L172
-    app.use((err, req, res, next) => {
-      console.error(prettyError.render(err))
-      finalHandler(req, res)(err)
-    })
+  // supply `morgan: null` to turn off. defaults to `morgan('dev')`, supply string to change logging type or supply `morgan` object to avoid default morgan logging
+  if (morgan !== null) {
+    const Morgan = require('morgan');
+    switch (typeof morgan) {
+      case 'string':
+        app.use(Morgan(morgan));
+        break;
+      case 'object':
+        app.use(morgan)
+        break;
+      default:
+        app.use(Morgan('dev'))
+    }
   }
   
   // const passport = require('passport')
   // const session = require('express-session');
   // const db = require('../db');
-  // const morgan = require('morgan');
   // const cors = require('cors');
   
   // // take stuff from .env file in development, from process.env in production
   // if (process.env.NODE_ENV === 'development') {
   //   require('dotenv').config();
   // }
-  // const cors = require('cors');
-  // app.use(cors());
-  // app.options('*', cors());
 
-
-  // here we export `app` and `listen` as the public facing API
+  // ************************************
+  // here we export the public facing API
+  // ************************************
+  
   this.app = app;
   this.listen = () => {
     const appserver = app.listen(
@@ -78,6 +62,28 @@ var server = (function (params, options = {}) {
       }
     )
     return appserver
+  }
+  this.finalHandler = () => {
+    // Error middleware interceptor, delegates to same handler Express uses.
+    // https://github.com/expressjs/express/blob/master/lib/application.js#L162
+    // https://github.com/pillarjs/finalhandler/blob/master/index.js#L172
+
+    const PrettyError = require('pretty-error')
+    const finalHandler = require('finalhandler')
+    // PrettyError docs: https://www.npmjs.com/package/pretty-error
+
+    // Pretty error prints errors all pretty.
+    const prettyError = new PrettyError
+    // Skip events.js and http.js and similar core node files.
+    prettyError.skipNodeFiles()
+    // Skip all the trace lines about express' core and sub-modules.
+    prettyError.skipPackage('express')
+
+    app.use((err, req, res, next) => {
+      debug('---finalHandler triggered---')
+      console.error(prettyError.render(err)) // could also print err.stack
+      finalHandler(req, res)(err)
+    })
   }
 
   return this;
