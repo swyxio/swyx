@@ -11,10 +11,12 @@ An experimental lightweight sugar module to integrate the NERDS (Node, Express, 
 
     var client = require('swyx').client; // not yet implemented
 
-    var server = require('swyx').server;
-    var app = server.app;
-    app.use('/', (req, res) => res.send('Hello World'))
-    app.finalHandler() // optional error handling
+    const server = require('swyx').server();
+    const app = server.app;
+    app.get('/', (req, res) => res.send('Hello World'))
+    app.get('/api', (req, res) => res.send('this is api route'))
+    app.use(server.finalHandler) // optional error handling
+    server.listen()
   
   
   foobar
