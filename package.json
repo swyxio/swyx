@@ -1,7 +1,7 @@
 {
   "name": "swyx",
-  "version": "0.1.7",
-  "description": "an integrated authentication library",
+  "version": "0.1.8",
+  "description": "An experimental lightweight sugar module to integrate the NERDS (Node, Express, ReDux, and SQL) stack.",
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter nyan"
