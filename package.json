@@ -1,6 +1,6 @@
 {
   "name": "swyx",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "an integrated authentication library",
   "main": "index.js",
   "scripts": {
