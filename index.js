@@ -1,11 +1,11 @@
 'use strict';
 
-/**
- * Adds commas to a number
- * @param {number} number
- * @param {string} locale
- * @return {string}
- */
-module.exports = function(number, locale) {
-    return number.toLocaleString(locale);
-};
+const client = require('./client')
+const server = require('./server')
+
+// be extremely clear which side of the `swyx` module you are using. wont be able to just `require('swyx')`
+
+module.exports = {
+    client,
+    server
+}
