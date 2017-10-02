@@ -1,17 +1,25 @@
 const chalk = require('chalk')
 const debug = require('debug')('swyx:server') // run node/nodemon with `DEBUG=*` prefix to see all debug logs
+const express = require('express')
+const path = require('path')
 
-var server = function (params, middleware = {}) {
-  // accepts modules that you give it if you want to take over
-  let { app } = params || {}
-  // if not it supplies its own
-  app = app || require('express')()
-
+var server = function (middlewareParams = {}, listenParams = {}) {
   // everything instantiated, now parse through options
-  const { 
+  const {
+    userApp,    // supply an express instance if you want, will set one up for you if you don't have one
     bodyParser, // supply `bodyParser: null` to turn off the default json and urlencoded config
     morgan,     // supply `morgan: null` to turn off. defaults to `morgan('dev')`, supply string to change logging type or supply `morgan` object to avoid default morgan logging
-  } = middleware
+    staticRouting, // supply `staticRouting: null` to turn off. defaults to `/public`.
+  } = middlewareParams
+
+  const {
+    htmlSPA, // catchall to render single page apps. supply `htmlSPA: null` to turn off. defaults to `/public/index.html`.
+    socketCallback // off by default. supply a callback fn `socket => {socket.on('event', ()=>console.log('event'))}` to turn on
+  } = listenParams
+
+  // accepts modules that you give it if you want to take over
+  // if not it supplies its own
+  app = userApp || express()
 
   // supply `bodyParser: null` to turn off the default code below
   if (bodyParser !== null) {
@@ -35,6 +43,12 @@ var server = function (params, middleware = {}) {
     }
   }
   
+  // supply `staticRouting: null` to turn off. defaults to `/public`.
+  if (staticRouting !== null) {
+    const staticRoutingPath = staticRouting || '/public'
+    app.use(express.static(path.join(__dirname, '..', staticRoutingPath)))
+  }
+
   // const passport = require('passport')
   // const session = require('express-session');
   // const db = require('../db');
@@ -51,6 +65,12 @@ var server = function (params, middleware = {}) {
 
   this.app = app;
   this.listen = () => {
+    if (htmlSPA !== null) {
+      const htmlSPApath = htmlSPA || '/public/index.html'
+      app.use('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '..', htmlSPApath))
+      })
+    }
     const appserver = app.listen(
       process.env.PORT || 3000,
       () => {
@@ -61,6 +81,12 @@ var server = function (params, middleware = {}) {
         console.log(`Listening on http://${urlSafeHost}:${port}`)
       }
     )
+    // supply a callback fn `socket => {socket.on('event', ()=>console.log('event'))}` to turn on
+    if (typeof socketCallback === 'function') {
+      const socketio = require('socket.io')
+      const io = socketio(appserver)
+      io.on('connection', socketCallback)
+    }
     return appserver
   }
   this.finalHandler = (err, req, res, next) => {

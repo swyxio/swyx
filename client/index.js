@@ -1,5 +1,9 @@
-// not yet implemented
+import io from 'socket.io-client'
 
-module.exports = {
-  msg: 'not yet implemented'
-}
+const socket = io(window.location.origin)
+
+socket.on('connect', () => {
+  console.log('Socket Connected!')
+})
+
+module.exports = socket
