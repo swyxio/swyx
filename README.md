@@ -15,13 +15,17 @@ Simply pass a callback function to `listenOptions` to set up `socket.io` on the 
 
   `npm install swyx`
 
-## Usage
+## Example Usage
 
 `index.js` for the server:
     const socketCallback = socket => {
       console.log(`A socket connection to the server has been made: ${socket.id}`)
       socket.on('disconnect', () => {
         console.log(`Connection ${socket.id} has left the building`)
+      })
+      socket.on('client', val => {
+        console.log('client received', val);
+        socket.broadcast.emit('server', val)
       })
     }
     const middlewareOptions = {
@@ -42,10 +46,13 @@ Simply pass a callback function to `listenOptions` to set up `socket.io` on the 
   
 
 `index.js` on the client:
-    import {client} from 'swyx'
-    client(() => {
+    import io from 'socket.io-client'
+
+    const socket = io(window.location.origin)
+    socket.on('connect', () => {
       console.log('Socket Connected!')
-    }) // 'Socket Connected!'
+      socket.on('server', val => console.log('server', val))
+    })
 
   Documentation to be completed
 

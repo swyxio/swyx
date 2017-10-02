@@ -46,7 +46,7 @@ var server = function (middlewareParams = {}, listenParams = {}) {
   // supply `staticRouting: null` to turn off. defaults to `/public`.
   if (staticRouting !== null) {
     const staticRoutingPath = staticRouting || '/public'
-    app.use(express.static(path.join(__dirname, '..', staticRoutingPath)))
+    app.use(express.static(path.join(process.env.PWD, staticRoutingPath)))
   }
 
   // const passport = require('passport')
@@ -68,7 +68,7 @@ var server = function (middlewareParams = {}, listenParams = {}) {
     if (htmlSPA !== null) {
       const htmlSPApath = htmlSPA || '/public/index.html'
       app.use('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', htmlSPApath))
+        res.sendFile(path.join(process.env.PWD, htmlSPApath))
       })
     }
     const appserver = app.listen(
