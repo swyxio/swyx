@@ -1,9 +1,20 @@
-import io from 'socket.io-client'
+// const io = require('socket.io-client')
 
-const socket = io(window.location.origin)
+// const socketGen = () => {
+//   const socket = io(window.location.origin)
+//   socket.on('connect', () => {
+//     console.log('Socket Connected!')
+//   })
+// }
 
-socket.on('connect', () => {
-  console.log('Socket Connected!')
-})
+// module.exports = socketGen
 
-module.exports = socket
+const io = require('socket.io-client')
+
+const socketGen = clientSocketCallback => {
+  const socket = io(window.location.origin)
+  socket.on('connect', clientSocketCallback(socket))
+  return socket
+}
+
+module.exports = socketGen

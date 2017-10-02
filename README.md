@@ -1,7 +1,15 @@
 Swyx module
 =========
 
-An experimental lightweight sugar module to integrate the NERDS (Node, Express, ReDux, and SQL) stack.
+An experimental lightweight sugar module to integrate the NERDS (Node, Express, ReDux, and SQL) stack for rapidly setting up fullstack JS apps.
+
+Included functionality configured by default (but optional):
+- `body-parser`
+- `morgan`
+- `express.static` to the `/public` folder
+- `app.use('*', ...)` catchall route to serve `/public/index.html` for SPAs
+
+Simply pass a callback function to `listenOptions` to set up `socket.io` on the backend.
 
 ## Installation
 
@@ -9,6 +17,7 @@ An experimental lightweight sugar module to integrate the NERDS (Node, Express, 
 
 ## Usage
 
+`index.js` for the server:
     const socketCallback = socket => {
       console.log(`A socket connection to the server has been made: ${socket.id}`)
       socket.on('disconnect', () => {
@@ -31,8 +40,14 @@ An experimental lightweight sugar module to integrate the NERDS (Node, Express, 
     app.use(server.finalHandler) // optional error handling
     server.listen()
   
-  
-  some more words.
+
+`index.js` on the client:
+    import {client} from 'swyx'
+    client(() => {
+      console.log('Socket Connected!')
+    }) // 'Socket Connected!'
+
+  Documentation to be completed
 
 
 ## Tests (not maintained yet as this is still in alpha testing)
