@@ -18,6 +18,8 @@ Simply pass a callback function to `listenOptions` to set up `socket.io` on the 
 ## Example Usage
 
 `index.js` for the server:
+
+```
     const socketCallback = socket => {
       console.log(`A socket connection to the server has been made: ${socket.id}`)
       socket.on('disconnect', () => {
@@ -43,9 +45,11 @@ Simply pass a callback function to `listenOptions` to set up `socket.io` on the 
     app.get('/api', (req, res) => res.send('this is api route'))
     app.use(server.finalHandler) // optional error handling
     server.listen()
-  
+```
 
 `index.js` on the client:
+
+```
     import io from 'socket.io-client'
 
     const socket = io(window.location.origin)
@@ -53,6 +57,7 @@ Simply pass a callback function to `listenOptions` to set up `socket.io` on the 
       console.log('Socket Connected!')
       socket.on('server', val => console.log('server', val))
     })
+```
 
   Documentation to be completed
 
