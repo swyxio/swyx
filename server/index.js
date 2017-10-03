@@ -14,7 +14,7 @@ var server = function (middlewareParams = {}, listenParams = {}) {
 
   const {
     htmlSPA, // catchall to render single page apps. supply `htmlSPA: null` to turn off. defaults to `/public/index.html`.
-    socketCallback // off by default. supply a callback fn `socket => {socket.on('event', ()=>console.log('event'))}` to turn on
+    socketCallback // off by default. supply a callback fn `io => socket => {socket.on('event', ()=>console.log('event'))}` to turn on
   } = listenParams
 
   // accepts modules that you give it if you want to take over
@@ -81,11 +81,11 @@ var server = function (middlewareParams = {}, listenParams = {}) {
         console.log(`Listening on http://${urlSafeHost}:${port}`)
       }
     )
-    // supply a callback fn `socket => {socket.on('event', ()=>console.log('event'))}` to turn on
+    // supply a callback fn `io => socket => {socket.on('event', ()=>console.log('event'))}` to turn on
     if (typeof socketCallback === 'function') {
       const socketio = require('socket.io')
       const io = socketio(appserver)
-      io.on('connection', socketCallback)
+      io.on('connection', socketCallback(io))
     }
     return appserver
   }

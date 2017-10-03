@@ -20,7 +20,7 @@ Simply pass a callback function to `listenOptions` to set up `socket.io` on the 
 `index.js` for the server:
 
 ```
-    const socketCallback = socket => {
+    const socketCallback = io => socket => {
       console.log(`A socket connection to the server has been made: ${socket.id}`)
       socket.on('disconnect', () => {
         console.log(`Connection ${socket.id} has left the building`)
@@ -38,7 +38,7 @@ Simply pass a callback function to `listenOptions` to set up `socket.io` on the 
     }
     const listenOptions = {
       // htmlSPA, // catchall to render single page apps. supply `htmlSPA: null` to turn off. defaults to `/public/index.html`.
-      socketCallback // off by default. supply a callback fn `socket => {socket.on('event', ()=>console.log('event'))}` to turn on
+      socketCallback // off by default. supply a callback fn `io => socket => {socket.on('event', ()=>console.log('event'))}` to turn on
     }
     const server = require('swyx').server(middlewareOptions, listenOptions);
     const app = server.app;
