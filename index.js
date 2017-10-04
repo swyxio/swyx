@@ -1,11 +1,5 @@
 'use strict';
 
-const client = require('./client')
-const server = require('./server')
+// const client = require('./client') // not implemented for now, but if i can figure out a way to avoid webpack bundling up the entire server i will revisit
 
-// be extremely clear which side of the `swyx` module you are using. wont be able to just `require('swyx')`
-
-module.exports = {
-    client,
-    server
-}
+module.exports = require('./server')

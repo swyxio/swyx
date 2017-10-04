@@ -1,6 +1,6 @@
 {
   "name": "swyx",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "An experimental lightweight sugar module to integrate the NERDS (Node, Express, ReDux, and SQL) stack.",
   "main": "index.js",
   "scripts": {
@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "body-parser": "^1.18.2",
-    "chalk": "^2.1.0",
     "debug": "^3.1.0",
     "express": "^4.16.1",
     "finalhandler": "^1.1.0",

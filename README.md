@@ -1,9 +1,15 @@
 Swyx module
 =========
 
-An experimental lightweight sugar module to integrate the NERDS (Node, Express, ReDux, and SQL) stack for rapidly setting up fullstack JS apps.
+An experimental sugar module to integrate the NERDS (Node, Express, ReDux, and SQL) stack for rapidly setting up fullstack JS Single Page Apps.
 
-Included functionality configured by default (but optional):
+```javascript
+const app = require('swyx')().app
+app.get('/', (req, res) => res.send('Hello World'))
+app.start() // visit http://localhost:3000 to see 'Hello World'
+```
+
+In this 3-line Hello World example, here is the included functionality configured by default:
 - `body-parser`
 - `morgan`
 - `express.static` to the `/public` folder
@@ -15,48 +21,46 @@ Simply pass a callback function to `listenOptions` to set up `socket.io` on the 
 
   `npm install swyx`
 
-## Example Usage
+## Example Usage with sockets (and annotated options)
 
 `index.js` for the server:
 
-```
-    const socketCallback = io => socket => {
-      console.log(`A socket connection to the server has been made: ${socket.id}`)
-      socket.on('disconnect', () => {
-        console.log(`Connection ${socket.id} has left the building`)
-      })
-      socket.on('client', val => {
-        console.log('client received', val);
-        socket.broadcast.emit('server', val)
-      })
-    }
-    const middlewareOptions = {
-      // userApp,    // supply an express instance if you want, will set one up for you if you don't have one
-      // bodyParser, // supply `bodyParser: null` to turn off the default json and urlencoded config
-      // morgan,     // supply `morgan: null` to turn off. defaults to `morgan('dev')`, supply string to change logging type or supply `morgan` object to avoid default morgan logging
-      // staticRouting, // supply `staticRouting: null` to turn off. defaults to `/public`.
-    }
-    const listenOptions = {
-      // htmlSPA, // catchall to render single page apps. supply `htmlSPA: null` to turn off. defaults to `/public/index.html`.
-      socketCallback // off by default. supply a callback fn `io => socket => {socket.on('event', ()=>console.log('event'))}` to turn on
-    }
-    const server = require('swyx').server(middlewareOptions, listenOptions);
-    const app = server.app;
-    app.get('/api', (req, res) => res.send('this is api route'))
-    app.use(server.finalHandler) // optional error handling
-    server.listen()
+```javascript
+const server = require('swyx')({
+  // userApp,    // supply an express instance if you want, will set one up for you if you don't have one
+  // bodyParser, // supply `bodyParser: null` to turn off the default json and urlencoded config
+  // morgan,     // supply `morgan: null` to turn off. defaults to `morgan('dev')`, supply string to change logging type or supply `morgan` object to avoid default morgan logging
+  // staticRouting, // supply `staticRouting: null` to turn off. defaults to `/public`.
+})
+const app = server.app
+app.get('/api', (req, res) => res.send('this is api route'))
+app.use(server.finalHandler) // optional error handling
+const socketCallback = io => socket => {
+  console.log(`A socket connection to the server has been made: ${socket.id}`)
+  socket.on('disconnect', () => {
+    console.log(`Connection ${socket.id} has left the building`)
+  })
+  socket.on('client', val => {
+    console.log('client received', val);
+    socket.broadcast.emit('server', val)
+  })
+}
+server.start({
+  // htmlSPA, // catchall to render single page apps. supply `htmlSPA: null` to turn off. defaults to `/public/index.html`.
+  socketCallback // off by default. supply a callback fn `io => socket => {socket.on('event', ()=>console.log('event'))}` to turn on
+})
 ```
 
-`index.js` on the client:
+`socket.io` is implemented for you on the server side, but is up to you to implement on client side. Sample socket connection on the client:
 
-```
-    import io from 'socket.io-client'
+```javascript
+import io from 'socket.io-client'
 
-    const socket = io(window.location.origin)
-    socket.on('connect', () => {
-      console.log('Socket Connected!')
-      socket.on('server', val => console.log('server', val))
-    })
+const socket = io(window.location.origin)
+socket.on('connect', () => {
+  console.log('Socket Connected!')
+  socket.on('server', val => console.log('server', val))
+})
 ```
 
   Documentation to be completed

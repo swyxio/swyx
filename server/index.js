@@ -1,70 +1,20 @@
-const chalk = require('chalk')
-const debug = require('debug')('swyx:server') // run node/nodemon with `DEBUG=*` prefix to see all debug logs
-const express = require('express')
+const debug = require('debug')('swyx:server') // run node/nodemon with `DEBUG=swyx:server` prefix to see my debug logs
 const path = require('path')
 
-var server = function (middlewareParams = {}, listenParams = {}) {
-  // everything instantiated, now parse through options
-  const {
-    userApp,    // supply an express instance if you want, will set one up for you if you don't have one
-    bodyParser, // supply `bodyParser: null` to turn off the default json and urlencoded config
-    morgan,     // supply `morgan: null` to turn off. defaults to `morgan('dev')`, supply string to change logging type or supply `morgan` object to avoid default morgan logging
-    staticRouting, // supply `staticRouting: null` to turn off. defaults to `/public`.
-  } = middlewareParams
+var server = function (middlewareParams) {
 
-  const {
-    htmlSPA, // catchall to render single page apps. supply `htmlSPA: null` to turn off. defaults to `/public/index.html`.
-    socketCallback // off by default. supply a callback fn `io => socket => {socket.on('event', ()=>console.log('event'))}` to turn on
-  } = listenParams
-
-  // accepts modules that you give it if you want to take over
-  // if not it supplies its own
-  app = userApp || express()
-
-  // supply `bodyParser: null` to turn off the default code below
-  if (bodyParser !== null) {
-    const bp = require('body-parser')
-    app.use(bp.json());
-    app.use(bp.urlencoded({ extended: true }));
-  }
-
-  // supply `morgan: null` to turn off. defaults to `morgan('dev')`, supply string to change logging type or supply `morgan` object to avoid default morgan logging
-  if (morgan !== null) {
-    const Morgan = require('morgan');
-    switch (typeof morgan) {
-      case 'string':
-        app.use(Morgan(morgan));
-        break;
-      case 'object':
-        app.use(morgan)
-        break;
-      default:
-        app.use(Morgan('dev'))
-    }
-  }
-  
-  // supply `staticRouting: null` to turn off. defaults to `/public`.
-  if (staticRouting !== null) {
-    const staticRoutingPath = staticRouting || '/public'
-    app.use(express.static(path.join(process.env.PWD, staticRoutingPath)))
-  }
-
-  // const passport = require('passport')
-  // const session = require('express-session');
-  // const db = require('../db');
-  // const cors = require('cors');
-  
-  // // take stuff from .env file in development, from process.env in production
-  // if (process.env.NODE_ENV === 'development') {
-  //   require('dotenv').config();
-  // }
+  let app = require('./setupServer')(middlewareParams)
 
   // ************************************
   // here we export the public facing API
   // ************************************
 
-  this.app = app;
-  this.listen = () => {
+  this.start = (startParams = {}) => {
+    const {
+      htmlSPA, // catchall to render single page apps. supply `htmlSPA: null` to turn off. defaults to `/public/index.html`.
+      socketCallback // off by default. supply a callback fn `io => socket => {socket.on('event', ()=>console.log('event'))}` to turn on
+    } = startParams
+
     if (htmlSPA !== null) {
       const htmlSPApath = htmlSPA || '/public/index.html'
       app.use('*', (req, res) => {
@@ -74,7 +24,7 @@ var server = function (middlewareParams = {}, listenParams = {}) {
     const appserver = app.listen(
       process.env.PORT || 3000,
       () => {
-        console.log(`--- Started HTTP Server for package:swyx ---`)
+        debug(`--- Started HTTP Server for swyx:server ---`)
         const { address, port } = appserver.address()
         const host = address === '::' ? 'localhost' : address
         const urlSafeHost = host.includes(':') ? `[${host}]` : host
@@ -89,6 +39,8 @@ var server = function (middlewareParams = {}, listenParams = {}) {
     }
     return appserver
   }
+  app.start = this.start // just a synonym, named `start` so as not to conflict with `app.listen`
+  this.app = app
   this.finalHandler = (err, req, res, next) => {
       // Error middleware interceptor, delegates to same handler Express uses.
       // https://github.com/expressjs/express/blob/master/lib/application.js#L162
@@ -108,9 +60,7 @@ var server = function (middlewareParams = {}, listenParams = {}) {
       console.error(prettyError.render(err)) // could also print err.stack
       finalHandler(req, res)(err)
   }
-
-  return this;
-
+  return this
 }
 
 module.exports = server
