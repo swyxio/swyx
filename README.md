@@ -3,10 +3,12 @@ Swyx module
 
 An experimental sugar module to integrate the NERDS (Node, Express, ReDux, and SQL) stack for rapidly setting up fullstack JS Single Page Apps.
 
+There was a big breaking change from 0.1.17 onward, please note the API change if you used it from before
+
 ```javascript
 const app = require('swyx')().app
-app.get('/', (req, res) => res.send('Hello World'))
-app.start() // visit http://localhost:3000 to see 'Hello World'
+app.get('/hello', (req, res) => res.send('Hello World'))
+app.start() // visit http://localhost:3000/hello to see 'Hello World'
 ```
 
 In this 3-line Hello World example, here is the included functionality configured by default:
@@ -14,8 +16,9 @@ In this 3-line Hello World example, here is the included functionality configure
 - `morgan`
 - `express.static` to the `/public` folder
 - `app.use('*', ...)` catchall route to serve `/public/index.html` for SPAs
+- uses port 3000 by default unless you specify the `PORT` env variable (e.g. `PORT=1337 node index.js`)
 
-Simply pass a callback function to `listenOptions` to set up `socket.io` on the backend.
+Simply pass a callback function `io => socket => {...}` to `app.start` to set up `socket.io` on the backend.
 
 ## Installation
 
@@ -42,7 +45,7 @@ const socketCallback = io => socket => {
   })
   socket.on('client', val => {
     console.log('client received', val);
-    socket.broadcast.emit('server', val)
+    socket.broadcast.emit('server', val) // or `io.sockets.emit('server', val)` to send to all including sender
   })
 }
 server.start({

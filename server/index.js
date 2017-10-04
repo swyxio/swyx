@@ -67,4 +67,4 @@ module.exports = server
 
 // Start listening only if we're the main module.
 // https://nodejs.org/api/modules.html#modules_accessing_the_main_module
-if (module === require.main) server.listen()
+if (module === require.main) server.start()

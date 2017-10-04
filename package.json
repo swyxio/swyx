@@ -1,7 +1,7 @@
 {
   "name": "swyx",
-  "version": "0.1.18",
-  "description": "An experimental lightweight sugar module to integrate the NERDS (Node, Express, ReDux, and SQL) stack.",
+  "version": "0.1.19",
+  "description": "An experimental sugar module to integrate the NERDS (Node, Express, ReDux, and SQL) stack for rapidly setting up fullstack JS Single Page Apps.",
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter nyan"

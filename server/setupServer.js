@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path')
 const setupServer = (middlewareParams = {}) => {
   const {
     userApp,    // supply an express instance if you want, will set one up for you if you don't have one
